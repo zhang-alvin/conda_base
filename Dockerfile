@@ -12,8 +12,8 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
     rm ~/miniconda.sh && \
     ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
-    #echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    #echo "conda activate base" >> ~/.bashrc
+
+#finished installing miniconda
 
 # Configure environment
 ENV SHELL /bin/bash
@@ -26,7 +26,6 @@ ENV PATH /opt/conda/bin:$PATH
 
 # Create jovyan user with UID=1000 and in the 'users' group
 RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER
-
 RUN chown -R $NB_USER:users /home/$NB_USER
 
 EXPOSE 8888
@@ -38,29 +37,15 @@ USER $NB_USER
 WORKDIR /home/$NB_USER
 
 SHELL ["bash", "-lc"]
-#RUN echo ". /etc/profile.d/conda.sh" >> ~/.bashrc 
 
 RUN git clone https://github.com/erdc/proteus && \
     cd proteus && \
     git checkout master && \
-    #git submodule update --init --recursive && \
-    #./stack/hit/bin/hit init-home && \
-    #./stack/hit/bin/hit remote add http://levant.hrwallingford.com/hashdist_src --objects="source" && \
-    #make stack stack/hit/bin/hit stack/default.yaml && \
-    #cd stack && \
-    #./hit/bin/hit build -j 4 default.yaml -v && \
-    #chmod u+rwX -R /home/$NB_USER/.hashdist/src && \
-    #rm -rf rm -rf /home/$NB_USER/.hashdist/src && \
     conda env create -f environment-dev.yml && \
+    conda clean --all -f -y && \ 
     rm -rf /home/$NB_USER/.cache && \
-    #chmod u+rwX -R /home/$NB_USER/.hashdist/bld/chrono/*/share/chrono/data && \
-    #rm -rf /home/$NB_USER/.hashdist/bld/chrono/*/share/chrono/data/* && \
-    rm -rf /home/$NB_USER/proteus/.git && \
-    rm -rf /home/$NB_USER/stack/.git && \
-    rm -rf /home/$NB_USER/air-water-vv/.git && \
-    rm -rf /home/$NB_USER/proteus/air-water-vv && \
-    rm -rf /home/$NB_USER/proteus/build && \
-    rm -rf /home/$NB_USER/proteus/stack/default
+    cd ~ && \ 
+    rm -rf proteus/
 
 ARG conda_env=proteus-dev
 RUN echo "source activate ${conda_env}" > ~/.bashrc
@@ -68,6 +53,3 @@ RUN echo "source activate ${conda_env}" > ~/.bashrc
 # prepend conda environment to path
 ENV PATH $CONDA_DIR/envs/${conda_env}/bin:$PATH
 ENV CONDA_DEFAULT_ENV ${conda_env}
-
-#SHELL ["bash", "-lc"]
-#RUN conda activate proteus-dev
