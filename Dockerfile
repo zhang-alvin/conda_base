@@ -50,9 +50,8 @@ RUN git clone https://github.com/erdc/proteus && \
     rm -rf /opt/conda/pkgs/* && \
     rm -rf /home/$NB_USER/.cache && \
     rm -rf ~/.conda/envs/proteus-dev/share/chrono/data/* && \
-    pip install -v -e .
-    #cd ~ && \ 
-    #rm -rf proteus/
+    cd ~ && \ 
+    rm -rf proteus/
 
 ARG conda_env=proteus-dev
 RUN echo "source activate ${conda_env}" > ~/.bashrc
