@@ -6,12 +6,13 @@ MAINTAINER Proteus Project <proteus@googlegroups.com>
 
 USER root
 
-SHELL ["bash", "-lc"]
+#SHELL ["bash", "-lc"]
 
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
     rm ~/miniconda.sh && \
-    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    rm -rf /opt/conda/pkgs/*
 
 #finished installing miniconda
 
@@ -28,6 +29,9 @@ ENV PATH /opt/conda/bin:$PATH
 RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER
 RUN chown -R $NB_USER:users /home/$NB_USER
 
+#allow user to remove /opt/conda/pkgs contents
+RUN chown -R $NB_USER:users /opt/conda/pkgs
+
 EXPOSE 8888
 WORKDIR /home/$NB_USER
 
@@ -43,7 +47,9 @@ RUN git clone https://github.com/erdc/proteus && \
     git checkout master && \
     conda env create -f environment-dev.yml && \
     conda clean --all -f -y && \ 
+    rm -rf /opt/conda/pkgs/* && \
     rm -rf /home/$NB_USER/.cache && \
+    rm -rf ~/.conda/envs/proteus-dev/share/chrono/data/* && \
     cd ~ && \ 
     rm -rf proteus/
 
